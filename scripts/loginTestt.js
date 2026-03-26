@@ -1,27 +1,30 @@
 import { sleep } from 'k6';
-import { generateClientId } from '../utils/common.js';
-import { getInstantToken, login } from '../utils/auth.js';
+import { createSession } from '../utils/session.js';
+import { getAuthHeaders } from '../utils/headers.js';
 
-// ✅ Load users.json properly
+// Load users
 const users = JSON.parse(open('../data/users.json'));
+
+export const options = {
+    vus: 1,
+    iterations: 1,
+};
 
 export default function () {
 
-    const clientId = generateClientId();
-    console.log("ClientId: " + clientId);
+    // 🔹 Random user
+    const user = users[0];
 
-    // Step 1: Get Instant Token
-    const instantToken = getInstantToken(clientId);
-    console.log("instantToken from logintest is " + instantToken);
+    // 🔹 Full auth flow
+    const { clientId, token } = createSession(user);
 
-    // Step 2: Login
-    const user = users[0];   // ✅ Now this works
+    console.log("Final Token:", token);
 
-    console.log("user from logintest is " + JSON.stringify(user));
+    // 🔹 Common headers for ALL APIs
+    const headers = getAuthHeaders(clientId, token);
 
-    const loginToken = login(clientId, instantToken, user);
-
-    console.log("Login Token: " + loginToken);
+    // 👉 Example API call
+    // http.get(`${BASE_URL}/some-api`, { headers });
 
     sleep(1);
 }
