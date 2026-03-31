@@ -1,4 +1,9 @@
-export const BASE_URL = 'https://test.bijib.in';
+const ENV = __ENV.ENV || 'test';
+
+export const BASE_URL =
+    ENV === 'uat'
+        ? 'https://uat.bijib.in'
+        : 'https://test.bijib.in';
 
 export const ENDPOINTS = {
     INSTANT_TOKEN: '/auth-node/instant_token',
