@@ -1,26 +1,21 @@
 import http from 'k6/http';
 import { sleep } from 'k6';
 import { createLoginSession } from '../utils/session.js';
-import { BASE_URL, ENDPOINTS } from '../config/config.js';
+import { BASE_URL } from '../config/config.js';
 import { getAuthHeaders } from '../utils/headers.js';
+import { options } from '../config/config.js';  // ✅ import options
+
+export { options };  // ✅ export options
 
 const users = JSON.parse(open('../data/users.json'));
-
-export const options = {
-    vus: 1,
-    iterations: 1,
-};
 
 export default function () {
 
     const user = users[0];
 
-    // ✅ Only login
     const { clientId, loginToken } = createLoginSession(user);
-
     const headers = getAuthHeaders(clientId, loginToken);
 
-    // 🔹 UMS APIs
     http.post(`${BASE_URL}/auth-v2-node/profile/gp`,
         JSON.stringify({ memberid: user.memberid }),
         { headers }
